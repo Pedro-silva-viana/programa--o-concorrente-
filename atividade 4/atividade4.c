@@ -4,7 +4,7 @@
 #include <time.h>
 
 #define MAX 100
-#define TAMANHO 9000009
+#define TAMANHO 1000000000
 
 double *gerar_vetor(int n);
 float *gerar_vetor_float(float n);
@@ -16,6 +16,8 @@ int main() {
     /*
     INICIO
     */
+    int p = omp_get_num_threads();
+    p=p/2;
     int a;
     float media=0;
     double *vetorf=NULL;
@@ -27,7 +29,7 @@ int main() {
     int *vetor = NULL;
     vetor = gerar_vetor_inteiro(TAMANHO);
     double inicio = omp_get_wtime();
-    #pragma omp parallel num_threads(3)
+    #pragma omp parallel num_threads(p)
     {
         #pragma omp for reduction (+:variavel)
         for (int i = 0; i < TAMANHO; i++){
@@ -36,7 +38,6 @@ int main() {
             }
         }
     }
-    printf("a quantidade do reduction e:%d \n",variavel);
     variavel=0;
     double fim = omp_get_wtime();
     double inicio1 = omp_get_wtime();
@@ -50,12 +51,13 @@ int main() {
         }
     }
     double fim1 = omp_get_wtime();
-    printf("tempo do reduction e:%2f\n",fim-inicio);
-    printf("a quantidade do normal e:%d \n",variavel);
-    printf("tempo normal e:%2f\n",fim1-inicio1);
+    printf("tempo do reduction e:%lf\n",fim-inicio);
+    printf("Speedup do reduction e:%lf\n",(fim-inicio)/(fim1-inicio1));
+    double Speedup=(fim-inicio)/(fim1-inicio1);
+    printf("Eficiencia do reduction:%lf\n",Speedup/p);
     variavel=0;
     inicio = omp_get_wtime();
-    #pragma omp parallel num_threads(3)
+    #pragma omp parallel num_threads(p)
     {
         int id = omp_get_thread_num();
         int num=0;
@@ -70,7 +72,10 @@ int main() {
     }
     fim = omp_get_wtime();
     printf("tempo da operasao com critical operasao:%2f\n",fim-inicio);
-    printf("numero de numeros iguais com critical:%d\n",variavel);
+    printf("Speedup do critical e:%2f\n",(fim-inicio)/(fim1-inicio1));
+    Speedup=(fim-inicio)/(fim1-inicio1);
+    printf("numero de numeros iguais:%d\n",variavel);
+    printf("Eficiencia do critical:%lf\n",Speedup/p);
     /*
     FIM
     */
