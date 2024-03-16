@@ -3,7 +3,7 @@
 #include <time.h>
 #include <mpi.h>
 
-#define MAX 100
+#define MAX 1000
 int *gerar_vetor_binario(int *vetor,int n);
 int main() {
     
